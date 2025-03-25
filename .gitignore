@@ -1,0 +1,12 @@
+# Python bytecode files
+**/__pycache__/
+*.pyc
+
+# IDE files (e.g., PyCharm)
+.idea/
+
+# Other
+*.log
+*.pot
+*.pyc*.pyc
+__pycache__/
