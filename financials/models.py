@@ -32,5 +32,8 @@ class Transaction(models.Model):
     # Date input
     date = models.DateField()
 
+    class Meta:
+        ordering = ['-date']
+
     def __str__(self):
         return f"{self.type} of {self.amount} on {self.date} by {self.user}"
