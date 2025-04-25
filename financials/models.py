@@ -11,7 +11,7 @@ class Category(models.Model):
         unique_together = 'user', 'name'
 
     def __str__(self):
-        return self.name
+        return f"{self.user}: {self.name}"
 
 
 class Transaction(models.Model):
