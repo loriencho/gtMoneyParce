@@ -16,6 +16,10 @@
 {%  if categories %}
     <form method="GET">
         <div>
+        <input id="Income" type="checkbox" name="Income" checked="checked">
+        <label for="Income">Income</label>
+        <input id="Expense" type="checkbox" name="Expense" checked="checked">
+        <label for="Expense">Expense</label>
         {% for category in categories %}
             <input id={{ category.name }} type="checkbox" name={{ category.name }}>
             <label for={{ category.name }}>{{ category.name }}</label>
