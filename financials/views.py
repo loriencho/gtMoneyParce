@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from financials.models import Transaction
+from financials.models import Transaction, Category
+
 
 # Create your views here.
 def index(request):
@@ -10,6 +11,18 @@ def index(request):
 
 @login_required
 def transactions_list(request):
-    transactions = Transaction.objects.filter(user=request.user)
-    context = {'transactions': transactions}
+    categories = Category.objects.filter(user=request.user)
+    context = {}
+    filter_list = []
+    for category in categories:
+        if request.GET.get(category.name):
+            filter_list.append(category.name)
+
+    if filter_list:
+        transactions = Transaction.objects.filter(user=request.user, category__name__in=filter_list)
+    else:
+        transactions = Transaction.objects.filter(user=request.user)
+
+    context['transactions'] =  transactions
+    context['categories'] = categories
     return render(request, 'financials/transactions-list.html', context)
