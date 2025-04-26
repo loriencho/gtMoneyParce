@@ -37,3 +37,13 @@ class Transaction(models.Model):
 
     def __str__(self):
         return f"{self.type} of {self.amount} on {self.date} by {self.user}"
+
+class Account(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    transaction_list = models.ManyToManyField(Transaction, blank=True)
+    category_list = models.ManyToManyField(Category, blank=True)
+    income = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    expense = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+
+    def __str__(self):
+        return f"{self.user}'s account"

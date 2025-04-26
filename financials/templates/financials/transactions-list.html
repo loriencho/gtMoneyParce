@@ -10,10 +10,12 @@
 </h1>
 
 <div>
+
+{% if transactions %}
 <h2>
     Categories:
 </h2>
-{%  if categories %}
+<div>
     <form method="GET">
         <div>
         <input id="Income" type="checkbox" name="Income" checked="checked">
@@ -29,11 +31,8 @@
             <button class="btn bg-dark text-white" type="submit">Filter</button>
         </div>
     </form>
-{%  endif %}
 </div>
 
-<div>
-{% if transactions %}
     <table class="table">
         <thead>
             <tr>

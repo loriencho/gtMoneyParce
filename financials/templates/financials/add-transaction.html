@@ -1,10 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block head_title %}
+    Transaction List
+{% endblock %}
+
+{% block content %}
+<div>
+    <form method="GET">
+        <div>
+        <input id="Income" type="checkbox" name="Income" checked="checked">
+        <label for="Income">Income</label>
+        <input id="Expense" type="checkbox" name="Expense" checked="checked">
+        <label for="Expense">Expense</label>
+        {% for category in categories %}
+            <input id={{ category.name }} type="checkbox" name={{ category.name }}>
+            <label for={{ category.name }}>{{ category.name }}</label>
+        {% endfor %}
+        </div>
+        <div>
+            <button class="btn bg-dark text-white" type="submit">Filter</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
