@@ -52,14 +52,14 @@ class Account(models.Model):
 
     def calculate_income(self):
         self.income = 0
-        for transaction in self.transaction_list.all():
+        for transaction in self.transaction_list.filter(type='income'):
             self.income += transaction.amount
         self.save()
         return self.income
 
     def calculate_expense(self):
         self.expense = 0
-        for transaction in self.transaction_list.all():
+        for transaction in self.transaction_list.filter(type='expense'):
             self.expense += transaction.amount
         self.save()
         return self.expense
