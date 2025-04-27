@@ -69,4 +69,8 @@ class Account(models.Model):
 
     def over_budget(self):
         return self.expense > self.budget
+
+    def update_values(self):
+        self.calculate_income()
+        self.calculate_expense()
     

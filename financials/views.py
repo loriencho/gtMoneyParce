@@ -5,10 +5,16 @@ from financials.forms import TransactionForm, EditTransactionForm
 from financials.models import Transaction, Category, Account
 
 # Create your views here.
+@login_required
 def index(request):
-    template_data = {}
-    template_data['title'] = 'Money Parce'
-    return render(request, 'financials/index.html', {'template_data': template_data})
+    context = {}
+    context['title'] = 'Money Parce'
+
+    account, _ = Account.objects.get_or_create(user=request.user)
+    account.update_values()
+    context['account'] = account
+
+    return render(request, 'financials/index.html', {'template_data': context})
 
 @login_required
 def transactions_list(request):
