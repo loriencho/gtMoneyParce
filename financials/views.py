@@ -3,12 +3,45 @@ from django.contrib.auth.decorators import login_required
 
 from financials.forms import TransactionForm, EditTransactionForm, BudgetForm
 from financials.models import Transaction, Category, Account
+from decimal import Decimal
+import json
 
+@login_required
 @login_required
 def dashboard(request):
     context = {}
     context['title'] = 'Money Parce'
 
+    transactions = Transaction.objects.filter(user=request.user)
+    context['transactions'] = transactions
+
+    expenses = transactions.filter(type='expense')
+    income = transactions.filter(type='income')
+
+    total_expenses = sum(t.amount for t in expenses)
+    total_income = sum(t.amount for t in income)
+
+    if total_expenses > total_income:
+        advice = "You are spending more than you are earning. Consider budgeting better or reducing expenses."
+    elif total_expenses > Decimal('0.8') * total_income:
+        advice = "You're spending a large part of your income. Try to save more!"
+    elif total_expenses < Decimal('0.5') * total_income:
+        advice = "Good job! You’re saving a good amount of your income!"
+    else:
+        advice = "Your spending is balanced with your income."
+
+    context['advice'] = advice
+
+    category_totals = {}
+    for transaction in expenses:
+        cat_name = transaction.category.name
+        if cat_name not in category_totals:
+            category_totals[cat_name] = 0
+        category_totals[cat_name] += transaction.amount
+
+    context['category_totals'] = category_totals
+    context['category_totals_keys'] = json.dumps(list(category_totals.keys()))
+    context['category_totals_values'] = json.dumps([float(val) for val in category_totals.values()])
 
     account, _ = Account.objects.get_or_create(user=request.user)
     account.update_values()
@@ -21,6 +54,7 @@ def dashboard(request):
             account.budget = budget
             account.save()
     context['overbudget'] = account.over_budget()
+
     return render(request, 'financials/dashboard.html', {'context': context})
 
 
