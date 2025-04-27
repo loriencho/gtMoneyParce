@@ -1,12 +1,8 @@
-from urllib import request
-
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views.generic import FormView
 
-from financials.forms import TransactionForm
-from financials.models import Transaction, Category, Account, Budget
-
+from financials.forms import TransactionForm, EditTransactionForm
+from financials.models import Transaction, Category, Account
 
 # Create your views here.
 def index(request):
@@ -66,5 +62,37 @@ def add_transaction(request):
             )
             transaction.save()
             account.transaction_list.add(transaction)
+            return redirect('financials.transactions-list')
+    return render(request, 'financials/add-transaction.html', context)
+
+@login_required
+def edit_transaction(request, transaction_id):
+    context = {}
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    context['form'] = EditTransactionForm(user=request.user, old=transaction)
+    if request.user != transaction.user:
+        return redirect('financials.transactions-list')
+    if request.method == 'POST':
+        form = EditTransactionForm(user=request.user, old=transaction, data=request.POST)
+        if form.is_valid():
+            account, _ = Account.objects.get_or_create(user=request.user)
+            if form.cleaned_data['new_category']:
+                category = Category(
+                    user=request.user,
+                    name=form.cleaned_data['new_category'],
+                )
+                try:
+                    category.save()
+                    account.category_list.add(category)
+                except:
+                    category = Category.objects.get(name=form.cleaned_data['new_category'])
+            else:
+                category = form.cleaned_data['category']
+
+            transaction.amount = form.cleaned_data['amount']
+            transaction.type = form.cleaned_data['type']
+            transaction.category = category
+            transaction.date = form.cleaned_data['date']
+            transaction.save()
             return redirect('financials.transactions-list')
     return render(request, 'financials/add-transaction.html', context)
