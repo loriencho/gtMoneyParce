@@ -44,3 +44,6 @@ class EditTransactionForm(forms.ModelForm):
         self.fields['date'].initial = old.date
         self.fields['type'].initial = old.type
         self.fields['category'].initial = old.category
+
+class BudgetForm(forms.Form):
+    budget = forms.DecimalField(decimal_places=2, max_digits=10)

@@ -18,7 +18,7 @@
         <input id="Expense" type="checkbox" name="Expense" checked="checked">
         <label for="Expense">Expense</label>
         {% for category in categories %}
-            <input id={{ category.name }} type="checkbox" name={{ category.name }}>
+            <input id={{ category.name }} type="checkbox" name={{ category.id }}>
             <label for={{ category.name }}>{{ category.name }}</label>
         {% endfor %}
         </div>
@@ -45,7 +45,7 @@
         </thead>
 
         <tbody>
-            {%  for transaction in transactions %}
+            {% for transaction in transactions %}
                 <tr>
                     <td>{{ transaction.date }}</td>
                     <td>{{ transaction.category.name }}</td>

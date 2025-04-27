@@ -1,14 +1,28 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
-from financials.forms import TransactionForm, EditTransactionForm
+from financials.forms import TransactionForm, EditTransactionForm, BudgetForm
 from financials.models import Transaction, Category, Account
 
 # Create your views here.
+@login_required
 def index(request):
-    template_data = {}
-    template_data['title'] = 'Money Parce'
-    return render(request, 'financials/index.html', {'template_data': template_data})
+    context = {}
+    context['title'] = 'Money Parce'
+
+    account, _ = Account.objects.get_or_create(user=request.user)
+    account.update_values()
+    context['account'] = account
+    context['form'] = BudgetForm()
+    if request.method == 'POST':
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            budget = form.cleaned_data['budget']
+            account.budget = budget
+            account.save()
+    context['overbudget'] = account.over_budget()
+
+    return render(request, 'financials/index.html', {'context': context})
 
 @login_required
 def transactions_list(request):
@@ -17,7 +31,7 @@ def transactions_list(request):
     filter_list = []
     inout_list = []
     for category in categories:
-        if request.GET.get(category.name):
+        if request.GET.get(str(category.id)):
             filter_list.append(category.name)
     if request.GET.get('Income'):
         inout_list.append('income')
