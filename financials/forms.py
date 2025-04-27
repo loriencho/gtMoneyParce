@@ -47,3 +47,6 @@ class EditTransactionForm(forms.ModelForm):
 
 class BudgetForm(forms.Form):
     budget = forms.DecimalField(decimal_places=2, max_digits=10)
+
+class GraphTypeForm(forms.Form):
+    btn = forms.CharField(initial='Totals')

@@ -10,26 +10,27 @@
 </h1>
 
 <div>
-    Income: {{ context.account.income }}
+    <div style="padding: 2px; border-radius: 4px; margin: 2px">
+        Income: {{ context.account.income }}
+    </div>
+    <div style="padding: 2px; border-radius: 4px; margin: 2px">
+      Expense: {{ context.account.expense }}
+    </div>
+    {% if context.overbudget %}
+    <div style="background-color: red;display: inline-block; padding: 2px; border-radius: 4px; margin: 2px">
+      Budget: {{ context.account.budget }}
+    </div>
+    {% else %}
+    <div style="background-color: green;display: inline-block; padding: 2px; border-radius: 4px; margin: 2px">
+      Budget: {{ context.account.budget }}
+    </div>
+    {% endif %}
+    <form method="POST">
+        {% csrf_token %}
+        {{ context.budgetform }}
+        <button type="submit">Change Budget</button>
+    </form>
 </div>
-<div>
-    Expense: {{ context.account.expense }}
-</div>
-{% if context.overbudget %}
-<div style="background-color: red">
-    Budget: {{ context.account.budget }}
-</div>
-{% else %}
-<div style="background-color: green">
-    Budget: {{ context.account.budget }}
-</div>
-{% endif %}
-<form method="POST">
-    {% csrf_token %}
-    {{ context.form }}
-    <button type="submit">Change Budget</button>
-</form>
-
 <div class="mt-4">
   <h3>Financial Advice</h3>
   <div class="alert alert-info">
@@ -37,6 +38,7 @@
   </div>
 </div>
 
+{% if context.graph_type == 'Categories' %}
 <!-- ✨ NEW: Expenses by Category Graph -->
 <div class="mt-4">
   <h3>Expenses by Category</h3>
@@ -53,14 +55,38 @@ var chart = new Chart(ctx, {
     data: {
         labels: {{ context.category_totals_keys|safe }},
         datasets: [{
-            label: 'Expenses',
             data: {{ context.category_totals_values|safe }},
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: [
+                "#25CCF744","#FD727244","#54a0ff44","#00d2d344",
+                "#1abc9c44","#2ecc7144","#3498db44","#9b59b644","#34495e44",
+                "#16a08544","#27ae6044","#2980b944","#8e44ad44","#2c3e5044",
+                "#f1c40f44","#e67e2244","#e74c3c44","#ecf0f144","#95a5a644",
+                "#f39c1244","#d3540044","#c0392b44","#bdc3c744","#7f8c8d44",
+                "#55efc444","#81ecec44","#74b9ff44","#a29bfe44","#dfe6e944",
+                "#00b89444","#00cec944","#0984e344","#6c5ce744","#ffeaa744",
+                "#fab1a044","#ff767544","#fd79a844","#fdcb6e44","#e1705544",
+                "#d6303144","#feca5744","#5f27cd44","#54a0ff44","#01a3a444"
+            ],
+            borderColor: [
+                "#25CCF7","#FD7272","#54a0ff","#00d2d3",
+                "#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e",
+                "#16a085","#27ae60","#2980b9","#8e44ad","#2c3e50",
+                "#f1c40f","#e67e22","#e74c3c","#ecf0f1","#95a5a6",
+                "#f39c12","#d35400","#c0392b","#bdc3c7","#7f8c8d",
+                "#55efc4","#81ecec","#74b9ff","#a29bfe","#dfe6e9",
+                "#00b894","#00cec9","#0984e3","#6c5ce7","#ffeaa7",
+                "#fab1a0","#ff7675","#fd79a8","#fdcb6e","#e17055",
+                "#d63031","#feca57","#5f27cd","#54a0ff","#01a3a4"
+            ],
             borderWidth: 1
         }]
     },
     options: {
+        plugins: {
+            legend: {
+                display: false
+            },
+        },
         scales: {
             y: {
                 beginAtZero: true
@@ -69,7 +95,49 @@ var chart = new Chart(ctx, {
     }
 });
 </script>
+{% else %}
 
+<!-- ✨ NEW: Expenses by Category Graph -->
+<div class="mt-4">
+  <h3>Total Income and Expenses</h3>
+  <canvas id="expensesChart" width="400" height="200"></canvas>
+</div>
 
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+var ctx = document.getElementById('expensesChart').getContext('2d');
+var chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ["Income", "Expenses"],
+        datasets: [{
+            data: [{{ context.total_income|safe }}, {{ context.total_expenses|safe }}],
+            backgroundColor: ['#0000FF44', '#FF000044'],
+            borderColor: ['#0000FF', '#FF0000'],
+            borderWidth: 1,
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                display: false
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+
+<form method="get">
+    <input type="submit" name="btn" value="Totals">
+    <input type="submit" name="btn" value="Categories">
+</form>
 
 {% endblock %}

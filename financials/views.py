@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 
-from financials.forms import TransactionForm, EditTransactionForm, BudgetForm
+from financials.forms import TransactionForm, EditTransactionForm, BudgetForm, GraphTypeForm
 from financials.models import Transaction, Category, Account
 from decimal import Decimal
 import json
@@ -18,6 +18,8 @@ def dashboard(request):
     context['account'] = account
     total_expenses = account.calculate_expense()
     total_income = account.calculate_income()
+    context['total_expenses'] = total_expenses
+    context['total_income'] = total_income
 
     if total_expenses > total_income:
         advice = "You are spending more than you are earning. Consider budgeting better or reducing expenses."
@@ -41,14 +43,19 @@ def dashboard(request):
     context['category_totals_keys'] = json.dumps(list(category_totals.keys()))
     context['category_totals_values'] = json.dumps([float(val) for val in category_totals.values()])
 
+    context['budgetform'] = BudgetForm()
 
-    context['form'] = BudgetForm()
     if request.method == 'POST':
         form = BudgetForm(request.POST)
         if form.is_valid():
             budget = form.cleaned_data['budget']
             account.budget = budget
             account.save()
+    if request.GET.get('btn'):
+        context['graph_type'] = request.GET.get('btn')
+    else:
+        context['graph_type'] = 'Total'
+
     context['overbudget'] = account.over_budget()
 
     return render(request, 'financials/dashboard.html', {'context': context})
