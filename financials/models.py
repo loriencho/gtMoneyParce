@@ -39,6 +39,8 @@ class Transaction(models.Model):
     amount = models.DecimalField(decimal_places=2, max_digits=10)
     # Date input
     date = models.DateField()
+    # ID
+    id = models.AutoField(primary_key=True)
 
     class Meta:
         ordering = ['-date']

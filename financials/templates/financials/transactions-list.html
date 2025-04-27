@@ -39,6 +39,8 @@
                 <th>Category</th>
                 <th>Type</th>
                 <th>Amount</th>
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
         </thead>
 
@@ -49,6 +51,12 @@
                     <td>{{ transaction.category.name }}</td>
                     <td>{{ transaction.type }}</td>
                     <td>{{ transaction.amount }}</td>
+                    <td>
+                        <a href="{% url 'financials.edit_transaction' transaction_id=transaction.id %}">Edit</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'financials.delete_transaction' transaction_id=transaction.id %}">Delete</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
