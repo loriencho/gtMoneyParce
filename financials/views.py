@@ -9,6 +9,13 @@ from financials.models import Transaction, Category, Account
 def index(request):
     context = {}
     context['title'] = 'Money Parce'
+    return render(request, 'financials/index.html', {'context': context})
+
+@login_required
+def dashboard(request):
+    context = {}
+    context['title'] = 'Money Parce'
+
 
     account, _ = Account.objects.get_or_create(user=request.user)
     account.update_values()
@@ -21,8 +28,8 @@ def index(request):
             account.budget = budget
             account.save()
     context['overbudget'] = account.over_budget()
+    return render(request, 'financials/dashboard.html', {'context': context})
 
-    return render(request, 'financials/index.html', {'context': context})
 
 @login_required
 def transactions_list(request):
