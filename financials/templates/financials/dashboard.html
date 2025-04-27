@@ -9,27 +9,67 @@
     Financial Dashboard
 </h1>
 
-    <div>
+<div>
     Income: {{ context.account.income }}
-    </div>
-    <div>
-        Expense: {{ context.account.expense }}
-    </div>
-    </div>
-    {% if context.overbudget %}
-    <div style="background-color: red">
-        Budget: {{ context.account.budget }}
-    </div>
-    {% else %}
-    <div style="background-color: green">
-        Budget: {{ context.account.budget }}
-    </div>
-    {% endif %}
-    <form method="POST">
+</div>
+<div>
+    Expense: {{ context.account.expense }}
+</div>
+{% if context.overbudget %}
+<div style="background-color: red">
+    Budget: {{ context.account.budget }}
+</div>
+{% else %}
+<div style="background-color: green">
+    Budget: {{ context.account.budget }}
+</div>
+{% endif %}
+<form method="POST">
     {% csrf_token %}
-        {{ context.form }}
-        <button type="submit">Change Budget</button>
-    </form>
+    {{ context.form }}
+    <button type="submit">Change Budget</button>
+</form>
+
+<div class="mt-4">
+  <h3>Financial Advice</h3>
+  <div class="alert alert-info">
+    {{ context.advice }}
+  </div>
+</div>
+
+<!-- ✨ NEW: Expenses by Category Graph -->
+<div class="mt-4">
+  <h3>Expenses by Category</h3>
+  <canvas id="expensesChart" width="400" height="200"></canvas>
+</div>
+
+<!-- Load Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+var ctx = document.getElementById('expensesChart').getContext('2d');
+var chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ context.category_totals_keys|safe }},
+        datasets: [{
+            label: 'Expenses',
+            data: {{ context.category_totals_values|safe }},
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgb(255, 99, 132)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+
 
 
 {% endblock %}
