@@ -1,6 +1,11 @@
-from django.shortcuts import render
+from urllib import request
+
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from financials.models import Transaction, Category
+from django.views.generic import FormView
+
+from financials.forms import TransactionForm
+from financials.models import Transaction, Category, Account
 
 
 # Create your views here.
@@ -30,3 +35,35 @@ def transactions_list(request):
     context['transactions'] =  transactions
     context['categories'] = categories
     return render(request, 'financials/transactions-list.html', context)
+
+@login_required
+def add_transaction(request):
+    context = {}
+    context['form'] = TransactionForm(user=request.user)
+    if request.method == 'POST':
+        form = TransactionForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            account, _ = Account.objects.get_or_create(user=request.user)
+            if form.cleaned_data['new_category']:
+                category = Category(
+                    user=request.user,
+                    name=form.cleaned_data['new_category'],
+                )
+                try:
+                    category.save()
+                    account.category_list.add(category)
+                except:
+                    category = Category.objects.get(name=form.cleaned_data['new_category'])
+            else:
+                category = form.cleaned_data['category']
+            transaction = Transaction(
+                user=request.user,
+                amount=form.cleaned_data['amount'],
+                type=form.cleaned_data['type'],
+                category=category,
+                date=form.cleaned_data['date'],
+            )
+            transaction.save()
+            account.transaction_list.add(transaction)
+            return redirect('financials.transactions-list')
+    return render(request, 'financials/add-transaction.html', context)

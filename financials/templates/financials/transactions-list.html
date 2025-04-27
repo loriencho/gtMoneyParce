@@ -10,11 +10,6 @@
 </h1>
 
 <div>
-
-{% if transactions %}
-<h2>
-    Categories:
-</h2>
 <div>
     <form method="GET">
         <div>
@@ -33,6 +28,10 @@
     </form>
 </div>
 
+{% if transactions %}
+<h2>
+    Categories:
+</h2>
     <table class="table">
         <thead>
             <tr>
@@ -59,5 +58,6 @@
         No transactions Found
     </p>
 {% endif %}
+<a href="{% url 'financials.add_transaction' %}">Add Transaction</a>
 </div>
 {% endblock %}

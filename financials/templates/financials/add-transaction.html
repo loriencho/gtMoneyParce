@@ -5,21 +5,23 @@
 {% endblock %}
 
 {% block content %}
-<div>
-    <form method="GET">
-        <div>
-        <input id="Income" type="checkbox" name="Income" checked="checked">
-        <label for="Income">Income</label>
-        <input id="Expense" type="checkbox" name="Expense" checked="checked">
-        <label for="Expense">Expense</label>
-        {% for category in categories %}
-            <input id={{ category.name }} type="checkbox" name={{ category.name }}>
-            <label for={{ category.name }}>{{ category.name }}</label>
-        {% endfor %}
-        </div>
-        <div>
-            <button class="btn bg-dark text-white" type="submit">Filter</button>
-        </div>
-    </form>
-</div>
+<form method="post">
+        {% csrf_token %}
+        {{ form.amount.label_tag }}
+        {{ form.amount }}
+        <br> <br>
+        {{ form.type.label_tag }}
+        {{ form.type }}
+        <br> <br>
+        {{ form.category.label_tag }}
+        {{ form.category }}
+        <br> <br>
+        {{ form.new_category.label_tag }}
+        {{ form.new_category }}
+        <br> <br>
+        {{ form.date.label_tag }}
+        {{ form.date }}
+        <br> <br>
+        <button type="submit">Add Transaction</button>
+</form>
 {% endblock %}

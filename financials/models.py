@@ -11,7 +11,7 @@ class Category(models.Model):
         unique_together = 'user', 'name'
 
     def __str__(self):
-        return f"{self.user}: {self.name}"
+        return f"{self.name}"
 
 
 class Transaction(models.Model):
@@ -44,6 +44,7 @@ class Account(models.Model):
     category_list = models.ManyToManyField(Category, blank=True)
     income = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     expense = models.DecimalField(decimal_places=2, max_digits=10, default=0)
+    budget = models.DecimalField(decimal_places=2, max_digits=10, default=0)
 
     def __str__(self):
         return f"{self.user}'s account"
