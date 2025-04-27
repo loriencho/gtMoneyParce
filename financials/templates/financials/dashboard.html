@@ -25,7 +25,7 @@
       Budget: {{ context.account.budget }}
     </div>
     {% endif %}
-    <form method="POST">
+    <form method="POST" style="padding: 2px; border-radius: 4px; margin: 2px">
         {% csrf_token %}
         {{ context.budgetform }}
         <button type="submit">Change Budget</button>
