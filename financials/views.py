@@ -96,3 +96,9 @@ def edit_transaction(request, transaction_id):
             transaction.save()
             return redirect('financials.transactions-list')
     return render(request, 'financials/add-transaction.html', context)
+
+@login_required
+def delete_transaction(request, transaction_id):
+    transaction = get_object_or_404(Transaction, id=transaction_id)
+    transaction.delete()
+    return redirect('financials.transactions-list')
