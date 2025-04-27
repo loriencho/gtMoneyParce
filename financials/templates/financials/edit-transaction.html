@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+    Edit Transaction
+{% endblock %}
+
+{% block content %}
+<form method="post">
+        {% csrf_token %}
+        {{ form.amount.label_tag }}
+        {{ form.amount }}
+        <br> <br>
+        {{ form.type.label_tag }}
+        {{ form.type }}
+        <br> <br>
+        {{ form.category.label_tag }}
+        {{ form.category }}
+        <br> <br>
+        {{ form.new_category.label_tag }}
+        {{ form.new_category }}
+        <br> <br>
+        {{ form.date.label_tag }}
+        {{ form.date }}
+        <br> <br>
+        <button type="submit">Finish Editing</button>
+</form>
+{% endblock %}

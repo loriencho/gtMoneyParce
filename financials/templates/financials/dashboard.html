@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+    Dashboard
+{% endblock %}
+
+{% block content %}
+<h1>
+    Financial Dashboard
+</h1>
+
+    <div>
+    Income: {{ context.account.income }}
+    </div>
+    <div>
+        Expense: {{ context.account.expense }}
+    </div>
+    </div>
+    {% if context.overbudget %}
+    <div style="background-color: red">
+        Budget: {{ context.account.budget }}
+    </div>
+    {% else %}
+    <div style="background-color: green">
+        Budget: {{ context.account.budget }}
+    </div>
+    {% endif %}
+    <form method="POST">
+    {% csrf_token %}
+        {{ context.form }}
+        <button type="submit">Change Budget</button>
+    </form>
+
+
+{% endblock %}

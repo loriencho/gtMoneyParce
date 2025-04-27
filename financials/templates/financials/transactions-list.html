@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block head_title %}
+    Transaction List
+{% endblock %}
+
+{% block content %}
+<h1>
+    Transactions List
+</h1>
+
+<div>
+<div>
+    <form method="GET">
+        <div>
+        <input id="Income" type="checkbox" name="Income" checked="checked">
+        <label for="Income">Income</label>
+        <input id="Expense" type="checkbox" name="Expense" checked="checked">
+        <label for="Expense">Expense</label>
+        {% for category in categories %}
+            <input id={{ category.name }} type="checkbox" name={{ category.id }}>
+            <label for={{ category.name }}>{{ category.name }}</label>
+        {% endfor %}
+        </div>
+        <div>
+            <button class="btn bg-dark text-white" type="submit">Filter</button>
+        </div>
+    </form>
+</div>
+
+{% if transactions %}
+<h2>
+    Categories:
+</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.date }}</td>
+                    <td>{{ transaction.category.name }}</td>
+                    <td>{{ transaction.type }}</td>
+                    <td>{{ transaction.amount }}</td>
+                    <td>
+                        <a href="{% url 'financials.edit_transaction' transaction_id=transaction.id %}">Edit</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'financials.delete_transaction' transaction_id=transaction.id %}">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>
+        No transactions Found
+    </p>
+{% endif %}
+<a href="{% url 'financials.add_transaction' %}">Add Transaction</a>
+</div>
+{% endblock %}
