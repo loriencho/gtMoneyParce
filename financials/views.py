@@ -4,13 +4,6 @@ from django.contrib.auth.decorators import login_required
 from financials.forms import TransactionForm, EditTransactionForm, BudgetForm
 from financials.models import Transaction, Category, Account
 
-# Create your views here.
-@login_required
-def index(request):
-    context = {}
-    context['title'] = 'Money Parce'
-    return render(request, 'financials/index.html', {'context': context})
-
 @login_required
 def dashboard(request):
     context = {}
