@@ -17,7 +17,7 @@ def transactions_list(request):
     filter_list = []
     inout_list = []
     for category in categories:
-        if request.GET.get(category.name):
+        if request.GET.get(str(category.id)):
             filter_list.append(category.name)
     if request.GET.get('Income'):
         inout_list.append('income')

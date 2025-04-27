@@ -13,15 +13,6 @@ class Category(models.Model):
     def __str__(self):
         return f"{self.name}"
 
-class Budget(models.Model):
-    id = models.AutoField(primary_key=True)
-    total = models.IntegerField()
-    user = models.ForeignKey(User,
-        on_delete=models.CASCADE)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    def __str__(self):
-        return str(self.id) + ' - ' + self.user.username
-
 class Transaction(models.Model):
     # Income or Expense
     TRANSACTION_TYPE_CHOICES = (
