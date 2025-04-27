@@ -7,19 +7,17 @@ from decimal import Decimal
 import json
 
 @login_required
-@login_required
 def dashboard(request):
     context = {}
     context['title'] = 'Money Parce'
 
-    transactions = Transaction.objects.filter(user=request.user)
+    account, _ = Account.objects.get_or_create(user=request.user)
+    transactions = account.transaction_list.all()
     context['transactions'] = transactions
-
-    expenses = transactions.filter(type='expense')
-    income = transactions.filter(type='income')
-
-    total_expenses = sum(t.amount for t in expenses)
-    total_income = sum(t.amount for t in income)
+    account.update_values()
+    context['account'] = account
+    total_expenses = account.calculate_expense()
+    total_income = account.calculate_income()
 
     if total_expenses > total_income:
         advice = "You are spending more than you are earning. Consider budgeting better or reducing expenses."
@@ -33,7 +31,7 @@ def dashboard(request):
     context['advice'] = advice
 
     category_totals = {}
-    for transaction in expenses:
+    for transaction in transactions.filter(type='expense'):
         cat_name = transaction.category.name
         if cat_name not in category_totals:
             category_totals[cat_name] = 0
@@ -43,9 +41,7 @@ def dashboard(request):
     context['category_totals_keys'] = json.dumps(list(category_totals.keys()))
     context['category_totals_values'] = json.dumps([float(val) for val in category_totals.values()])
 
-    account, _ = Account.objects.get_or_create(user=request.user)
-    account.update_values()
-    context['account'] = account
+
     context['form'] = BudgetForm()
     if request.method == 'POST':
         form = BudgetForm(request.POST)
