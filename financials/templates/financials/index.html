@@ -10,19 +10,26 @@
 </h1>
 
     <div>
-    {{ account.income }}
+    Income: {{ context.account.income }}
     </div>
     <div>
-    <p>
-        Expense: {{ expense }}
-    </p>
+        Expense: {{ context.account.expense }}
     </div>
     </div>
-    <div>
-    <p>
-        Budget: {{ budget }}
-    </p>
+    {% if context.overbudget %}
+    <div style="background-color: red">
+        Budget: {{ context.account.budget }}
     </div>
+    {% else %}
+    <div style="background-color: green">
+        Budget: {{ context.account.budget }}
+    </div>
+    {% endif %}
+    <form method="POST">
+    {% csrf_token %}
+        {{ context.form }}
+        <button type="submit">Change Budget</button>
+    </form>
 
 
 {% endblock %}
