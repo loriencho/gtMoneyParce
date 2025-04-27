@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import FormView
 
 from financials.forms import TransactionForm
-from financials.models import Transaction, Category, Account
+from financials.models import Transaction, Category, Account, Budget
 
 
 # Create your views here.
@@ -34,6 +34,7 @@ def transactions_list(request):
 
     context['transactions'] =  transactions
     context['categories'] = categories
+
     return render(request, 'financials/transactions-list.html', context)
 
 @login_required
