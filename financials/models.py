@@ -56,3 +56,24 @@ class Account(models.Model):
 
     def __str__(self):
         return f"{self.user}'s account"
+
+    def calculate_income(self):
+        self.income = 0
+        for transaction in self.transaction_list.all():
+            self.income += transaction.amount
+        self.save()
+        return self.income
+
+    def calculate_expense(self):
+        self.expense = 0
+        for transaction in self.transaction_list.all():
+            self.expense += transaction.amount
+        self.save()
+        return self.expense
+
+    def calculate_total(self):
+        return self.income - self.expense
+
+    def over_budget(self):
+        return self.expense > self.budget
+    
