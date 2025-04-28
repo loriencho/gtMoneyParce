@@ -1,30 +1,34 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load static %}
+    <div class="text-center mt-5">
+        <h1 class="display-4 text-primary">About Us and Money Parce!</h1>
+        <p class="lead">We understand the struggle of managing finances, allow us to guide you on your journey. We aim to help you do things on your terms: set up your income, budget and more to track expenses and make smart financial decisions</p>
+        <p class="lead">Money Parce is a web app made by students who understand the importance of having a fluid budgeting system</p>
+    </div>
 <div class="p-3">
   <div class="container">
     <div class="row mt-3">
       <div class="col-md-6 mx-auto mb-3">
-          <p>
-              <strong>What is MoneyParce?</strong><br/>
-              MoneyParce is a smart financial management tool designed to help individuals understand and improve their money habits.
-          </p>
-        <p>
-            <strong>Key Features:</strong><br/>
-              - Track income and expenses easily<br/>
-              - Set monthly budgets and receive alerts when you overspend<br/>
-              - Categorize transactions automatically<br/>
-              - Visualize your financial trends clearly<br/>
-              - Access from any device, anytime
-        </p>
+            <h3 class="fw-semibold">Key Features:</h3>
+            <ul class="list-group">
+                <li class="list-group-item">💸 Track income and expenses easily</li>
+                <li class="list-group-item">💸 Set monthly budgets and receive alerts when you overspend</li>
+                <li class="list-group-item">💸 Categorize transactions automatically</li>
+                <li class="list-group-item">💸 Visualize your financial trends clearly</li>
+                <li class="list-group-item">💸 Access from any device, anytime</li>
+            </ul>
       </div>
 
       <div class="col-md-6 mx-auto mb-3 text-center">
-        <img src="{% static 'img/about.jpg' %}"
-             class="max-width-100"
-             alt="about" />
+
+        <img src="{% static 'financials/images/about.jpeg' %}"alt="Money management" class="img-fluid mt-4" style="max-width: 400px;">
+
       </div>
     </div>
   </div>
 </div>
+<footer class="bg-light text-center py-4">
+    <p>© 2025 Money Parce. All rights reserved.</p>
+</footer>
 {% endblock content %}

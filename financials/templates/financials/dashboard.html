@@ -5,49 +5,75 @@
 {% endblock %}
 
 {% block content %}
-<h1>
-    Financial Dashboard
-</h1>
+<h1 class="text-center my-4">Financial Dashboard</h1>
 
-<div>
-    <div style="padding: 2px; border-radius: 4px; margin: 2px">
-        Income: {{ context.total_income }}
+<div class="container">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3">
+        <h5>Income</h5>
+        <p class="text-success fw-bold">${{ context.total_income }}</p>
+      </div>
     </div>
-    <div style="padding: 2px; border-radius: 4px; margin: 2px">
-      Expense: {{ context.total_expenses }}
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3">
+        <h5>Expenses</h5>
+        <p class="text-danger fw-bold">${{ context.total_expenses }}</p>
+      </div>
     </div>
-    {% if context.overbudget %}
-    <div style="background-color: #FF000055; display: inline-block; padding: 2px; border-radius: 4px; border-width: 1px; border-color: red; border-style: solid; margin: 2px">
-      Budget: {{ context.account.budget }}
+
+    <div class="col-md-4">
+      <div class="card shadow-sm p-3 {% if context.overbudget %}border-danger{% else %}border-success{% endif %}">
+        <h5>Budget</h5>
+        <p class="{% if context.overbudget %}text-danger{% else %}text-success{% endif %} fw-bold">
+          ${{ context.account.budget }}
+        </p>
+      </div>
     </div>
-    {% else %}
-    <div style="background-color: #00FF0055;display: inline-block; padding: 2px; border-radius: 4px; border-width: 1px; border-color: green; border-style: solid; margin: 2px">
-      Budget: {{ context.account.budget }}
-    </div>
-    {% endif %}
-    <form method="POST" style="padding: 2px; border-radius: 4px; margin: 2px">
-        {% csrf_token %}
-        {{ context.budgetform }}
-        <button type="submit">Change Budget</button>
-    </form>
-</div>
-<div class="mt-4">
-  <h3>Financial Advice</h3>
-  <div class="alert alert-info">
-    {{ context.advice }}
   </div>
-</div>
-<h4>Date: {{ context.current_date }}</h4>
-<form method="get" id="btn">
-    <input type="submit" name="btn" value="Prev">
-    <input type="submit" name="btn" value="Next">
-</form>
 
-{% if context.graph_type == 'Categories' %}
-<!-- ✨ NEW: Expenses by Category Graph -->
-<div class="mt-4">
-  <h3>Expenses by Category</h3>
-  <canvas id="expensesChart" width="400" height="200"></canvas>
+  <div class="my-4">
+    <form method="POST" class="d-flex align-items-center gap-2">
+      {% csrf_token %}
+      {{ context.budgetform }}
+      <button class="btn btn-primary" type="submit">Update Budget</button>
+    </form>
+  </div>
+
+  <div class="my-5">
+    <h3>Financial Advice</h3>
+    <div class="alert alert-info">
+      {{ context.advice }}
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between my-3">
+    <h5>Date: {{ context.current_date }}</h5>
+    <form method="get" class="d-flex gap-2">
+      <button class="btn btn-outline-primary" type="submit" name="btn" value="Prev">Prev</button>
+      <button class="btn btn-outline-primary" type="submit" name="btn" value="Next">Next</button>
+    </form>
+  </div>
+
+  {% if context.graph_type == 'Categories' %}
+  <div class="my-5">
+    <h3 class="text-center">Expenses by Category</h3>
+    <canvas id="expensesChart" height="100"></canvas>
+  </div>
+  {% else %}
+  <div class="my-5">
+    <h3 class="text-center">Total Income and Expenses</h3>
+    <canvas id="expensesChart" height="100"></canvas>
+  </div>
+  {% endif %}
+
+  <div class="text-center my-4">
+    <form method="get" class="d-flex justify-content-center gap-3">
+      <button class="btn btn-secondary" type="submit" name="btn" value="Totals">Totals</button>
+      <button class="btn btn-secondary" type="submit" name="btn" value="Categories">Categories</button>
+    </form>
+  </div>
 </div>
 
 <!-- Load Chart.js -->
@@ -58,31 +84,43 @@ var ctx = document.getElementById('expensesChart').getContext('2d');
 var chart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: {{ context.category_totals_keys|safe }},
+        labels: {% if context.graph_type == 'Categories' %} {{ context.category_totals_keys|safe }} {% else %} ["Income", "Expenses"] {% endif %},
         datasets: [{
-            data: {{ context.category_totals_values|safe }},
-            backgroundColor: [
-                "#25CCF744","#FD727244","#54a0ff44","#00d2d344",
-                "#1abc9c44","#2ecc7144","#3498db44","#9b59b644","#34495e44",
-                "#16a08544","#27ae6044","#2980b944","#8e44ad44","#2c3e5044",
-                "#f1c40f44","#e67e2244","#e74c3c44","#ecf0f144","#95a5a644",
-                "#f39c1244","#d3540044","#c0392b44","#bdc3c744","#7f8c8d44",
-                "#55efc444","#81ecec44","#74b9ff44","#a29bfe44","#dfe6e944",
-                "#00b89444","#00cec944","#0984e344","#6c5ce744","#ffeaa744",
-                "#fab1a044","#ff767544","#fd79a844","#fdcb6e44","#e1705544",
-                "#d6303144","#feca5744","#5f27cd44","#54a0ff44","#01a3a444"
-            ],
-            borderColor: [
-                "#25CCF7","#FD7272","#54a0ff","#00d2d3",
-                "#1abc9c","#2ecc71","#3498db","#9b59b6","#34495e",
-                "#16a085","#27ae60","#2980b9","#8e44ad","#2c3e50",
-                "#f1c40f","#e67e22","#e74c3c","#ecf0f1","#95a5a6",
-                "#f39c12","#d35400","#c0392b","#bdc3c7","#7f8c8d",
-                "#55efc4","#81ecec","#74b9ff","#a29bfe","#dfe6e9",
-                "#00b894","#00cec9","#0984e3","#6c5ce7","#ffeaa7",
-                "#fab1a0","#ff7675","#fd79a8","#fdcb6e","#e17055",
-                "#d63031","#feca57","#5f27cd","#54a0ff","#01a3a4"
-            ],
+            data: {% if context.graph_type == 'Categories' %} {{ context.category_totals_values|safe }} {% else %} [{{ context.total_income|safe }}, {{ context.total_expenses|safe }}] {% endif %},
+            backgroundColor: {% if context.graph_type == 'Categories' %}
+            [
+              "#25CCF744","#FD727244","#54a0ff44","#00d2d344",
+              "#1abc9c44","#2ecc7144","#3498db44","#9b59b644",
+              "#34495e44","#16a08544","#27ae6044","#2980b944",
+              "#8e44ad44","#2c3e5044","#f1c40f44","#e67e2244",
+              "#e74c3c44","#ecf0f144","#95a5a644","#f39c1244",
+              "#d3540044","#c0392b44","#bdc3c744","#7f8c8d44",
+              "#55efc444","#81ecec44","#74b9ff44","#a29bfe44",
+              "#dfe6e944","#00b89444","#00cec944","#0984e344",
+              "#6c5ce744","#ffeaa744","#fab1a044","#ff767544",
+              "#fd79a844","#fdcb6e44","#e1705544","#d6303144",
+              "#feca5744","#5f27cd44","#54a0ff44","#01a3a444"
+            ]
+            {% else %}
+            ['#0000FF44', '#FF000044']
+            {% endif %},
+            borderColor: {% if context.graph_type == 'Categories' %}
+            [
+              "#25CCF7","#FD7272","#54a0ff","#00d2d3",
+              "#1abc9c","#2ecc71","#3498db","#9b59b6",
+              "#34495e","#16a085","#27ae60","#2980b9",
+              "#8e44ad","#2c3e50","#f1c40f","#e67e22",
+              "#e74c3c","#ecf0f1","#95a5a6","#f39c12",
+              "#d35400","#c0392b","#bdc3c7","#7f8c8d",
+              "#55efc4","#81ecec","#74b9ff","#a29bfe",
+              "#dfe6e9","#00b894","#00cec9","#0984e3",
+              "#6c5ce7","#ffeaa7","#fab1a0","#ff7675",
+              "#fd79a8","#fdcb6e","#e17055","#d63031",
+              "#feca57","#5f27cd","#54a0ff","#01a3a4"
+            ]
+            {% else %}
+            ['#0000FF', '#FF0000']
+            {% endif %},
             borderWidth: 1
         }]
     },
@@ -90,7 +128,7 @@ var chart = new Chart(ctx, {
         plugins: {
             legend: {
                 display: false
-            },
+            }
         },
         scales: {
             y: {
@@ -100,49 +138,5 @@ var chart = new Chart(ctx, {
     }
 });
 </script>
-{% else %}
-
-<!-- ✨ NEW: Expenses by Category Graph -->
-<div class="mt-4">
-  <h3>Total Income and Expenses</h3>
-  <canvas id="expensesChart" width="400" height="200"></canvas>
-</div>
-
-<!-- Load Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-var ctx = document.getElementById('expensesChart').getContext('2d');
-var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["Income", "Expenses"],
-        datasets: [{
-            data: [{{ context.total_income|safe }}, {{ context.total_expenses|safe }}],
-            backgroundColor: ['#0000FF44', '#FF000044'],
-            borderColor: ['#0000FF', '#FF0000'],
-            borderWidth: 1,
-        }]
-    },
-    options: {
-        plugins: {
-            legend: {
-                display: false
-            },
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-</script>
-{% endif %}
-
-<form method="get" id="btn">
-    <input type="submit" name="btn" value="Totals">
-    <input type="submit" name="btn" value="Categories">
-</form>
 
 {% endblock %}
