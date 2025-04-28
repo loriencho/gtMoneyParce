@@ -10,7 +10,7 @@
 </h1>
 
 <div>
-<div>
+<div style="padding: 10px">
     <form method="GET">
         <div>
         <input id="Income" type="checkbox" name="Income" checked="checked">
@@ -22,7 +22,7 @@
             <label for={{ category.name }}>{{ category.name }}</label>
         {% endfor %}
         </div>
-        <div>
+        <div style="padding: 10px; padding-left: 0px">
             <button class="btn bg-dark text-white" type="submit">Filter</button>
         </div>
     </form>
@@ -52,10 +52,10 @@
                     <td>{{ transaction.type }}</td>
                     <td>{{ transaction.amount }}</td>
                     <td>
-                        <a href="{% url 'financials.edit_transaction' transaction_id=transaction.id %}">Edit</a>
+                        <a href="{% url 'financials.edit_transaction' transaction_id=transaction.id %}" class="btn bg-dark text-white">Edit</a>
                     </td>
                     <td>
-                        <a href="{% url 'financials.delete_transaction' transaction_id=transaction.id %}">Delete</a>
+                        <a href="{% url 'financials.delete_transaction' transaction_id=transaction.id %}" class="btn bg-dark text-white">Delete</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -66,7 +66,7 @@
         No transactions Found
     </p>
 {% endif %}
-<a href="{% url 'financials.add_transaction' %}">Add Transaction</a>
+<a href="{% url 'financials.add_transaction' %}" class="btn bg-dark text-white">Add Transaction</a>
 </div>
 
 <script>

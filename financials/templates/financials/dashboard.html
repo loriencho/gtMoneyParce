@@ -11,10 +11,10 @@
 
 <div>
     <div style="padding: 2px; border-radius: 4px; margin: 2px">
-        Income: {{ context.account.income }}
+        Income: {{ context.total_income }}
     </div>
     <div style="padding: 2px; border-radius: 4px; margin: 2px">
-      Expense: {{ context.account.expense }}
+      Expense: {{ context.total_expenses }}
     </div>
     {% if context.overbudget %}
     <div style="background-color: #FF000055; display: inline-block; padding: 2px; border-radius: 4px; border-width: 1px; border-color: red; border-style: solid; margin: 2px">
@@ -37,6 +37,11 @@
     {{ context.advice }}
   </div>
 </div>
+<h4>Date: {{ context.current_date }}</h4>
+<form method="get" id="btn">
+    <input type="submit" name="btn" value="Prev">
+    <input type="submit" name="btn" value="Next">
+</form>
 
 {% if context.graph_type == 'Categories' %}
 <!-- ✨ NEW: Expenses by Category Graph -->
@@ -135,10 +140,9 @@ var chart = new Chart(ctx, {
 </script>
 {% endif %}
 
-<form method="get">
+<form method="get" id="btn">
     <input type="submit" name="btn" value="Totals">
     <input type="submit" name="btn" value="Categories">
 </form>
-
 
 {% endblock %}

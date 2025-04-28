@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.contrib.auth.models import User
@@ -67,10 +68,23 @@ class Account(models.Model):
     def calculate_total(self):
         return self.income - self.expense
 
-    def over_budget(self):
-        return self.expense > self.budget
+    def over_budget(self, date):
+        return self.monthly_expenses(date) > self.budget
 
     def update_values(self):
         self.calculate_income()
         self.calculate_expense()
-    
+
+    def monthly_income(self, date):
+        income = 0
+        for transaction in self.transaction_list.filter(type='income'):
+            if transaction.date >= date and transaction.date <= (date + relativedelta(months=+1)):
+                income += transaction.amount
+        return income
+
+    def monthly_expenses(self, date):
+        expenses = 0
+        for transaction in self.transaction_list.filter(type='expense'):
+            if transaction.date >= date and transaction.date <= (date + relativedelta(months=+1)):
+                expenses += transaction.amount
+        return expenses

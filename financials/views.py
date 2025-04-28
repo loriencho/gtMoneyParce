@@ -5,19 +5,48 @@ from financials.forms import TransactionForm, EditTransactionForm, BudgetForm, G
 from financials.models import Transaction, Category, Account
 from decimal import Decimal
 import json
+import datetime
+from dateutil.relativedelta import relativedelta
+
+current_date = datetime.date.today().replace(day=1)
+graph_type = 'Total'
 
 @login_required
 def dashboard(request):
     context = {}
     context['title'] = 'Money Parce'
+    global current_date
+    global graph_type
+
 
     account, _ = Account.objects.get_or_create(user=request.user)
     transactions = account.transaction_list.all()
     context['transactions'] = transactions
-    account.update_values()
     context['account'] = account
-    total_expenses = account.calculate_expense()
-    total_income = account.calculate_income()
+
+    if request.method == 'GET':
+        if request.GET.get('btn') == 'Prev':
+            current_date = (current_date + relativedelta(months=-1)).replace(day=1)
+        elif request.GET.get('btn') == 'Next':
+            current_date = (current_date + relativedelta(months=+1)).replace(day=1)
+        elif request.GET.get('btn') == 'Totals':
+            graph_type = 'Totals'
+        elif request.GET.get('btn') == 'Categories':
+            graph_type = 'Categories'
+
+    if request.method == 'POST':
+        form = BudgetForm(request.POST)
+        if form.is_valid():
+            budget = form.cleaned_data['budget']
+            account.budget = budget
+            account.save()
+
+    context['graph_type'] = graph_type
+    context['current_date'] = current_date.strftime('%B %Y')
+
+    total_expenses = account.monthly_expenses(current_date)
+    total_income = account.monthly_income(current_date)
+
     context['total_expenses'] = total_expenses
     context['total_income'] = total_income
 
@@ -34,29 +63,18 @@ def dashboard(request):
 
     category_totals = {}
     for transaction in transactions.filter(type='expense'):
-        cat_name = transaction.category.name
-        if cat_name not in category_totals:
-            category_totals[cat_name] = 0
-        category_totals[cat_name] += transaction.amount
+        if transaction.date >= current_date and transaction.date <= (current_date + relativedelta(months=+1)):
+            cat_name = transaction.category.name
+            if cat_name not in category_totals:
+                category_totals[cat_name] = 0
+            category_totals[cat_name] += transaction.amount
 
     context['category_totals'] = category_totals
     context['category_totals_keys'] = json.dumps(list(category_totals.keys()))
     context['category_totals_values'] = json.dumps([float(val) for val in category_totals.values()])
 
     context['budgetform'] = BudgetForm()
-
-    if request.method == 'POST':
-        form = BudgetForm(request.POST)
-        if form.is_valid():
-            budget = form.cleaned_data['budget']
-            account.budget = budget
-            account.save()
-    if request.GET.get('btn'):
-        context['graph_type'] = request.GET.get('btn')
-    else:
-        context['graph_type'] = 'Total'
-
-    context['overbudget'] = account.over_budget()
+    context['overbudget'] = account.over_budget(current_date)
 
     return render(request, 'financials/dashboard.html', {'context': context})
 

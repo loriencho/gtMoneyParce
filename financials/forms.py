@@ -50,3 +50,4 @@ class BudgetForm(forms.Form):
 
 class GraphTypeForm(forms.Form):
     btn = forms.CharField(initial='Totals')
+    change = forms.CharField()
