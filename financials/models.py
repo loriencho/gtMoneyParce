@@ -71,10 +71,6 @@ class Account(models.Model):
     def over_budget(self, date):
         return self.monthly_expenses(date) > self.budget
 
-    def update_values(self):
-        self.calculate_income()
-        self.calculate_expense()
-
     def monthly_income(self, date):
         income = 0
         for transaction in self.transaction_list.filter(type='income'):
