@@ -63,10 +63,12 @@ def dashboard(request):
 
 @login_required
 def transactions_list(request):
-    categories = Category.objects.filter(user=request.user)
+    account, _ = Account.objects.get_or_create(user=request.user)
+    categories = account.category_list.all()
     context = {}
     filter_list = []
     inout_list = []
+
     for category in categories:
         if request.GET.get(str(category.id)):
             filter_list.append(category.name)
@@ -75,9 +77,11 @@ def transactions_list(request):
     if request.GET.get('Expense'):
         inout_list.append('expense')
     if filter_list:
-        transactions = Transaction.objects.filter(user=request.user, category__name__in=filter_list, type__in=inout_list)
+        transactions = account.transaction_list.filter(category__name__in=filter_list, type__in=inout_list)
+    elif inout_list:
+        transactions = account.transaction_list.filter(type__in=inout_list)
     else:
-        transactions = Transaction.objects.filter(user=request.user, type__in=inout_list)
+        transactions = account.transaction_list.all()
 
     context['transactions'] =  transactions
     context['categories'] = categories
