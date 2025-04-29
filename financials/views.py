@@ -115,11 +115,20 @@ def add_transaction(request):
         if form.is_valid():
             account, _ = Account.objects.get_or_create(user=request.user)
             if form.cleaned_data['new_category']:
-                category, _ = account.category_list.get_or_create(name=form.cleaned_data['new_category'])
+                try:
+                    category = Category(
+                        user=request.user,
+                        name=form.cleaned_data['new_category'],
+                    )
+                    category.save()
+                    account.category_list.add(category)
+                except:
+                    category = Category.objects.get(name=form.cleaned_data['new_category'])
             else:
                 category = form.cleaned_data['category']
                 if not category:
-                    category, _ = account.category_list.get_or_create(name="Uncategorized")[0]
+                    category, _ = Category.objects.get_or_create(user=request.user, name="Uncategorized")
+                    account.category_list.add(category)
             transaction = Transaction(
                 user=request.user,
                 amount=abs(form.cleaned_data['amount']),
@@ -144,11 +153,20 @@ def edit_transaction(request, transaction_id):
         if form.is_valid():
             account, _ = Account.objects.get_or_create(user=request.user)
             if form.cleaned_data['new_category']:
-                category = Category.objects.get_or_create(name=form.cleaned_data['new_category'])
+                try:
+                    category = Category(
+                        user=request.user,
+                        name=form.cleaned_data['new_category'],
+                    )
+                    category.save()
+                    account.category_list.add(category)
+                except:
+                    category = Category.objects.get(name=form.cleaned_data['new_category'])
+                    account.category_list.add(category)
             else:
                 category = form.cleaned_data['category']
                 if not category:
-                    category, _ = account.category_list.get_or_create(name="Uncategorized")[0]
+                    category, _ = Category.objects.get_or_create(user=request.user, name="Uncategorized")
 
             transaction.amount = abs(form.cleaned_data['amount'])
             transaction.type = form.cleaned_data['type']
